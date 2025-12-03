@@ -101,6 +101,66 @@ class TestGenerateMockExam:
         # We'll just check that both exams have 5 questions
         assert len(ids1) == 5
         assert len(ids2) == 5
+    
+    def test_generate_exam_one_per_topic(self):
+        """Test generating exam with one question per topic."""
+        bank = QuestionBank()
+        # Create questions from 3 different topics
+        for i in range(9):
+            topic = f"topic{i // 3}"  # topic0, topic0, topic0, topic1, topic1, topic1, etc.
+            q = Question(
+                id=f"q{i}",
+                topic=topic,
+                text=f"Question {i}",
+                solution=f"Solution {i}"
+            )
+            bank.add_question(q)
+        
+        exam = generate_mock_exam(bank, 3, one_per_topic=True)
+        
+        assert exam.num_questions == 3
+        # Check that all questions are from different topics
+        topics_in_exam = [q.topic for q in exam.questions]
+        assert len(set(topics_in_exam)) == 3  # All topics should be unique
+    
+    def test_generate_exam_one_per_topic_too_many_questions(self):
+        """Test that requesting more questions than topics raises error."""
+        bank = QuestionBank()
+        # Create questions from 2 topics
+        for i in range(4):
+            topic = "topic0" if i < 2 else "topic1"
+            q = Question(
+                id=f"q{i}",
+                topic=topic,
+                text=f"Question {i}",
+                solution=f"Solution {i}"
+            )
+            bank.add_question(q)
+        
+        with pytest.raises(ValueError, match="Cannot generate"):
+            generate_mock_exam(bank, 3, one_per_topic=True)
+    
+    def test_generate_exam_one_per_topic_resets_when_needed(self):
+        """Test that one_per_topic resets when all questions in topics are done."""
+        bank = QuestionBank()
+        # Create questions from 2 topics, all done
+        for i in range(4):
+            topic = "topic0" if i < 2 else "topic1"
+            q = Question(
+                id=f"q{i}",
+                topic=topic,
+                text=f"Question {i}",
+                solution=f"Solution {i}",
+                done=True
+            )
+            bank.add_question(q)
+        
+        exam = generate_mock_exam(bank, 2, one_per_topic=True)
+        
+        assert exam.num_questions == 2
+        # Should have reset and selected one from each topic
+        topics_in_exam = [q.topic for q in exam.questions]
+        assert len(set(topics_in_exam)) == 2
 
 
 class TestReviewStats:

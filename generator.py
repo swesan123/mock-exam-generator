@@ -11,19 +11,23 @@ from parser import load_questions_from_latex
 from persistence import load_progress, save_progress
 
 
-def generate_mock_exam(question_bank: QuestionBank, num_questions: int) -> Exam:
+def generate_mock_exam(question_bank: QuestionBank, num_questions: int, one_per_topic: bool = False) -> Exam:
     """
     Generate a mock exam with the specified number of questions.
     
     Args:
         question_bank: The QuestionBank to select questions from
         num_questions: Number of questions to include in the exam
+        one_per_topic: If True, ensures at most one question per topic
     
     Returns:
         An Exam object containing the selected questions
     """
     if num_questions <= 0:
         raise ValueError("Number of questions must be positive")
+    
+    if one_per_topic:
+        return _generate_exam_one_per_topic(question_bank, num_questions)
     
     # Get unsolved questions
     unsolved = question_bank.get_unsolved_questions()
@@ -47,6 +51,76 @@ def generate_mock_exam(question_bank: QuestionBank, num_questions: int) -> Exam:
     for question in selected:
         question.done = True
         question.last_seen = current_time
+    
+    # Create exam
+    exam = Exam(
+        questions=selected,
+        num_questions=num_questions,
+        timestamp=current_time
+    )
+    
+    return exam
+
+
+def _generate_exam_one_per_topic(question_bank: QuestionBank, num_questions: int) -> Exam:
+    """
+    Generate a mock exam with at most one question per topic.
+    
+    Args:
+        question_bank: The QuestionBank to select questions from
+        num_questions: Number of questions to include in the exam
+    
+    Returns:
+        An Exam object containing the selected questions
+    """
+    # Get all available topics
+    topics = question_bank.get_topics()
+    
+    if num_questions > len(topics):
+        raise ValueError(
+            f"Cannot generate {num_questions} questions with one per topic. "
+            f"Only {len(topics)} topic(s) available: {', '.join(topics)}. "
+            f"Please request at most {len(topics)} question(s) or use normal selection mode."
+        )
+    
+    # Get unsolved questions grouped by topic
+    unsolved_by_topic = {}
+    for topic in topics:
+        topic_unsolved = [
+            q for q in question_bank.get_questions_by_topic(topic)
+            if not q.done
+        ]
+        if topic_unsolved:
+            unsolved_by_topic[topic] = topic_unsolved
+    
+    # If not enough topics have unsolved questions, reset all questions
+    if len(unsolved_by_topic) < num_questions:
+        question_bank.reset_all_questions()
+        unsolved_by_topic = {}
+        for topic in topics:
+            topic_unsolved = question_bank.get_questions_by_topic(topic)
+            if topic_unsolved:
+                unsolved_by_topic[topic] = topic_unsolved
+    
+    if len(unsolved_by_topic) < num_questions:
+        raise ValueError(
+            f"Not enough topics with available questions. "
+            f"Requested: {num_questions}, Available topics: {len(unsolved_by_topic)}"
+        )
+    
+    # Randomly select topics
+    selected_topics = random.sample(list(unsolved_by_topic.keys()), num_questions)
+    
+    # Select one random question from each selected topic
+    selected = []
+    current_time = datetime.now()
+    
+    for topic in selected_topics:
+        topic_questions = unsolved_by_topic[topic]
+        question = random.choice(topic_questions)
+        question.done = True
+        question.last_seen = current_time
+        selected.append(question)
     
     # Create exam
     exam = Exam(
@@ -163,9 +237,31 @@ def main() -> None:
                 print("Number of questions must be positive.")
                 continue
             
+            # Ask if user wants one question per topic
+            topics = question_bank.get_topics()
+            print(f"\nAvailable topics: {len(topics)} ({', '.join(topics)})")
+            print("Do you want one question per topic? (y/n, default: n):")
+            one_per_topic_input = input().strip().lower()
+            one_per_topic = one_per_topic_input in ['y', 'yes']
+            
+            if one_per_topic and num_questions > len(topics):
+                print("\n" + "=" * 60)
+                print("ERROR: Cannot generate exam with one question per topic")
+                print("=" * 60)
+                print(f"You requested: {num_questions} questions")
+                print(f"Available topics: {len(topics)}")
+                print(f"Topics: {', '.join(topics)}")
+                print(f"\nWith one question per topic, you can request at most {len(topics)} questions.")
+                print(f"Please try again with a number <= {len(topics)} or choose 'n' for normal selection.")
+                print("=" * 60 + "\n")
+                continue
+            
             # Generate exam
-            print(f"\nGenerating exam with {num_questions} questions...")
-            exam = generate_mock_exam(question_bank, num_questions)
+            if one_per_topic:
+                print(f"\nGenerating exam with {num_questions} questions (one per topic)...")
+            else:
+                print(f"\nGenerating exam with {num_questions} questions...")
+            exam = generate_mock_exam(question_bank, num_questions, one_per_topic=one_per_topic)
             
             # Create timestamped folder
             timestamp_str = exam.timestamp.strftime("%Y-%m-%d_%H-%M-%S")
