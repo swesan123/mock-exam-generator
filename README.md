@@ -63,11 +63,11 @@ mock-exam-generator/
 Each `.tex` file in `questions/` may contain multiple problems:
 
 ```latex
-egin{problem}
+\begin{problem}
 Apply Forward Euler with h=0.1 to y' = -y.
 \end{problem}
 
-egin{solution}
+\begin{solution}
 y1 = y0 + h(-y0)
 \end{solution}
 ```
@@ -120,20 +120,86 @@ pdflatex exam_TIMESTAMP.tex
 ### Prerequisites
 - Python 3.9+
 - A LaTeX distribution (optional, for PDF export)
+- Install dependencies: `pip install -r requirements.txt`
+
+### Installation
+
+1. Clone or download this repository
+2. Install required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ### Basic Usage
 
-```
-python generator.py --num 8
+Run the interactive program:
+
+```bash
+python3 generator.py
 ```
 
-Generates an 8‑question mock exam.
+The program will:
+1. Load all questions from `.tex` files in the `questions/` folder
+2. Prompt you to enter the number of questions for the mock exam
+3. Generate a randomized exam with the specified number of questions
+4. Export the exam and solutions to timestamped LaTeX files in `mock_exams/`
+5. Wait for you to press Enter after completing the exam
+6. Display statistics about your progress
+7. Allow you to generate another exam or quit (type 'q')
+
+### Example Session
+
+```
+Loading questions from LaTeX files...
+Loaded 25 questions from questions/
+
+============================================================
+MOCK EXAM GENERATOR
+============================================================
+Available questions: 25
+Enter the number of questions for the mock exam (or 'q' to quit):
+8
+
+Generating exam with 8 questions...
+
+Exam generated successfully!
+Exam file: mock_exams/2025-01-15_14-30-25/exam_2025-01-15_14-30-25.tex
+Solutions file: mock_exams/2025-01-15_14-30-25/solutions_2025-01-15_14-30-25.tex
+
+Solve the exam now. Press Enter when finished...
+[User presses Enter]
+
+Reviewing your performance...
+
+============================================================
+QUESTION BANK STATISTICS
+============================================================
+Total questions: 25
+Solved questions: 8
+Unsolved questions: 17
+Completion rate: 32.0%
+...
+```
 
 ### Folder Requirements
 
 ```
 questions/   # must exist and contain .tex files
 mock_exams/  # will be created automatically
+```
+
+### Running Tests
+
+To run the comprehensive test suite:
+
+```bash
+pytest tests/ -v
+```
+
+Or with coverage:
+
+```bash
+pytest tests/ --cov=. --cov-report=html
 ```
 
 ---

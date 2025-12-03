@@ -1,0 +1,485 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{ODE Practice Problems}
+\author{Swesan Pathmanathan}
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problems}
+
+\subsection*{Problem 1 — First-Order ODE (Analytic Solution)}
+Solve the initial value problem:
+\[
+y' = -y + t, \qquad y(0) = 5.
+\]
+Find the explicit closed-form solution \(y(t)\).
+
+\subsection*{Problem 2 — Pendulum System Conversion}
+The motion of a pendulum of length \(r = 1\) satisfies:
+\[
+\theta'' = -g \sin \theta, \qquad g = 9.81.
+\]
+Convert this second-order ODE into an equivalent first-order system in variables \(y_1, y_2\).  
+State the required initial conditions.
+
+\subsection*{Problem 3 — Forward Euler (Numeric Computation)}
+Apply Forward Euler with step size \(h = 0.1\) to the IVP:
+\[
+y' = -y + t, \qquad y(0)=5.
+\]
+Compute \(y_1, y_2, y_3\).
+
+\subsection*{Problem 4 — Backward Euler (Implicit Step)}
+For the same IVP:
+\[
+y' = -y + t, \qquad y(0)=5,
+\]
+derive the Backward Euler iteration formula for \(y_{i+1}\), then compute  
+\(y_1, y_2, y_3\) for \(h = 0.1\).
+
+\subsection*{Problem 5 — Forward Euler Stability Condition}
+Consider the linear test equation:
+\[
+y' = \lambda y,\qquad \lambda < 0.
+\]
+(a) Derive the stability condition for the Forward Euler method.  
+(b) State the maximum allowable step size \(h\) that ensures numerical stability.
+
+\subsection*{Problem 6 — Forward Euler Instability Demonstration}
+Consider:
+\[
+y' = -10y,\qquad y(0)=1.
+\]
+(a) Using Forward Euler, write the recurrence relation.  
+(b) Determine the stability bound for \(h\).  
+(c) For \(h = 0.21\), compute the first three steps \(y_1, y_2, y_3\).  
+(d) Explain why this step size leads to unstable growth or oscillation.
+
+\subsection*{Problem 7 — Backward Euler Stability}
+Apply Backward Euler to the linear test equation:
+\[
+y' = \lambda y,\qquad \lambda < 0.
+\]
+(a) Derive the Backward Euler update formula.  
+(b) Show that the method is unconditionally stable (stable for all \(h>0\)).
+
+\subsection*{Problem 8 — Backward Euler Computation}
+For:
+\[
+y' = -10y,\qquad y(0)=1,
+\]
+compute the Backward Euler approximations \(y_1, y_2, y_3\) for  
+(a) \(h = 0.05\),  
+(b) \(h = 0.15\),  
+(c) \(h = 0.50\),  
+(d) \(h = 1.0\).
+
+% ----------------------------
+% WEEK 10 TUTORIAL PROBLEMS
+% ----------------------------
+
+\subsection*{Problem 9 — Van der Pol System Conversion}
+Write the Van der Pol equation
+\[
+y'' - \mu(1 - y^2)y' + y = 0
+\]
+as a first-order system of ODEs.
+
+\subsection*{Problem 10 — Effect of Round-Off Error on IVPs}
+Consider the IVP:
+\[
+x' = x,\qquad x(0)=c.
+\]
+Suppose the value of \(c\) is perturbed when read into the computer as \(\tilde{c}=c+\varepsilon\).  
+(a) Determine the error at \(t=10\) and \(t=20\).  
+(b) Repeat the analysis for the IVP:
+\[
+x' = -x.
+\]
+
+\subsection*{Problem 11 — Trapezoidal Method on a Nonlinear ODE}
+Consider the nonlinear ODE:
+\[
+y' = y^2.
+\]
+(a) Write the implicit trapezoidal method for this ODE.  
+(b) Write the explicit trapezoidal (predictor–corrector) method.  
+(c) Derive the nonlinear equation that must be solved for \(y_{i+1}\) in the implicit method.
+
+% ----------------------------
+% ASSIGNMENT ODE PROBLEMS (FILTERED & SIMPLIFIED)
+% ----------------------------
+
+\subsection*{Problem 12 — Stiff Linear System (Theory + Analysis)}
+Consider the stiff linear ODE system:
+\[
+y' =
+\begin{pmatrix}
+-0.1 & -199.9 \\
+0 & -200
+\end{pmatrix} y,
+\qquad y(0) = \begin{pmatrix}2 \\ 1\end{pmatrix}.
+\]
+The exact solution is:
+\[
+y_1(t) = e^{-0.1 t} + e^{-200 t}, \qquad 
+y_2(t) = e^{-200 t}.
+\]
+
+(a) Compute the values of \(y_1(0.1)\), \(y_1(5)\), and \(y_1(100)\).  
+(b) Explain why this system is considered \emph{stiff}.  
+(c) Determine the dominant time scale and the fast time scale in the solution.  
+(d) Explain why an explicit Euler method would require a extremely small stepsize to remain stable.  
+(e) Briefly describe why implicit solvers (e.g., backward Euler) handle this problem efficiently.
+
+% ----------------------------
+% EXAM-STYLE RK4 PROBLEM
+% ----------------------------
+
+\subsection*{Problem 13 — Runge–Kutta 4th Order (One Step)}
+Consider the initial value problem
+\[
+y' = -2y + t, \qquad y(0) = 1.
+\]
+Use one step of the classical 4th-order Runge–Kutta method (RK4) with stepsize
+\[
+h = 0.1
+\]
+to approximate \(y(0.1)\).
+
+Write out the values of \(k_1, k_2, k_3, k_4\) and the final approximation \(y_1\).
+
+
+\section*{Solutions}
+
+\subsection*{Solution 1}
+Solve:
+\[
+y'=-y+t.
+\]
+Homogeneous: \(y_h = Ce^{-t}\).  
+Particular: \(y_p=t-1\).  
+General solution:
+\[
+y(t)=t-1+Ce^{-t}.
+\]
+Use \(y(0)=5\):
+\[
+-1 + C = 5 \Rightarrow C = 6.
+\]
+\[
+\boxed{y(t)=t-1+6e^{-t}}
+\]
+
+\subsection*{Solution 2}
+Let:
+\[
+y_1=\theta,\quad y_2=\theta'.
+\]
+Then:
+\[
+y_1' = y_2, \qquad y_2' = -g\sin(y_1).
+\]
+Required initial conditions:
+\[
+y_1(0)=\theta(0),\quad y_2(0)=\theta'(0).
+\]
+
+\subsection*{Solution 3}
+Forward Euler:
+\[
+y_{i+1} = y_i + h(-y_i + t_i), \quad h=0.1.
+\]
+\[
+\begin{aligned}
+y_1 &= 5 + 0.1(-5+0) = 4.5,\\
+y_2 &= 4.5 + 0.1(-4.5+0.1)=4.06,\\
+y_3 &= 4.06 + 0.1(-4.06+0.2)=3.674.
+\end{aligned}
+\]
+
+\subsection*{Solution 4}
+Backward Euler:
+\[
+y_{i+1} = y_i + h(-y_{i+1}+t_{i+1}).
+\]
+Solve for \(y_{i+1}\):
+\[
+y_{i+1}=\frac{y_i+ht_{i+1}}{1+h}.
+\]
+With \(h=0.1\):
+\[
+\begin{aligned}
+y_1 &= \frac{5 + 0.1(0.1)}{1.1}=4.5545,\\
+y_2 &= \frac{4.5545+0.1(0.2)}{1.1}=4.1586,\\
+y_3 &= \frac{4.1586+0.1(0.3)}{1.1}=3.7987.
+\end{aligned}
+\]
+
+\subsection*{Solution 5}
+Forward Euler on \(y'=\lambda y\):
+\[
+y_{i+1} = (1+h\lambda)y_i.
+\]
+Stability requires:
+\[
+|1+h\lambda|\le 1.
+\]
+For \(\lambda < 0\):
+\[
+0<h\le \frac{2}{|\lambda|}.
+\]
+
+\subsection*{Solution 6}
+Recurrence:
+\[
+y_{i+1} = (1 - 10h)y_i.
+\]
+Stability:
+\[
+|1-10h|\le 1 \Rightarrow h\le 0.2.
+\]
+For \(h=0.21\):
+\[
+\begin{aligned}
+y_1 &= -1.1,\\
+y_2 &= 1.21,\\
+y_3 &= -1.331.
+\end{aligned}
+\]
+Oscillation and growth → unstable.
+
+\subsection*{Solution 7}
+Backward Euler:
+\[
+y_{i+1}=y_i + h\lambda y_{i+1}.
+\]
+Solve:
+\[
+y_{i+1} = \frac{1}{1-h\lambda}y_i.
+\]
+Since \(\lambda<0\) and \(1-h\lambda>1\):
+\[
+\left|\frac{1}{1-h\lambda}\right|\le 1.
+\]
+Unconditionally stable for all \(h>0\).
+
+\subsection*{Solution 8}
+Backward Euler:
+\[
+y_{i+1}=\frac{1}{1+10h}y_i.
+\]
+
+(a) \(h=0.05\):
+\[
+y_1= \frac{1}{1.5},\quad
+y_2= \frac{1}{1.5^2},\quad
+y_3= \frac{1}{1.5^3}.
+\]
+
+(b) \(h=0.15\):
+\[
+y_i = (1/2.5)^i.
+\]
+
+(c) \(h=0.50\):
+\[
+y_i = (1/6)^i.
+\]
+
+(d) \(h=1.0\):
+\[
+y_i = (1/11)^i.
+\]
+
+% ----------------------------
+% WEEK 10 TUTORIAL SOLUTIONS
+% ----------------------------
+
+\subsection*{Solution 9}
+Let:
+\[
+x_1 = y,\qquad x_2 = y'.
+\]
+Then the system is:
+\[
+x_1' = x_2,\qquad
+x_2' = \mu(1 - x_1^2)x_2 - x_1.
+\]
+
+\subsection*{Solution 10}
+For \(x'=x\):
+\[
+x(t)=ce^t,\qquad \tilde{x}(t)=(c+\varepsilon)e^t.
+\]
+Error:
+\[
+e(t) = \tilde{x}(t)-x(t)=\varepsilon e^t.
+\]
+Thus:
+\[
+e(10)=\varepsilon e^{10},\qquad e(20)=\varepsilon e^{20}.
+\]
+
+For \(x'=-x\):
+\[
+x(t)=ce^{-t},\qquad \tilde{x}(t)=(c+\varepsilon)e^{-t}.
+\]
+Error:
+\[
+e(t)=\varepsilon e^{-t}.
+\]
+Thus:
+\[
+e(10)=\varepsilon e^{-10},\qquad e(20)=\varepsilon e^{-20}.
+\]
+
+\subsection*{Solution 11}
+Since \(f(t,y)=y^2\):
+
+(a) Implicit trapezoidal:
+\[
+y_{i+1}
+= y_i + \frac{h}{2}(y_i^2 + y_{i+1}^2).
+\]
+
+(b) Explicit trapezoidal (predictor–corrector):
+\[
+\tilde{y}_{i+1} = y_i + h y_i^2,
+\]
+\[
+y_{i+1}
+= y_i + \frac{h}{2}(y_i^2 + \tilde{y}_{i+1}^2).
+\]
+
+(c) Nonlinear equation to solve:
+\[
+g(y_{i+1}) =
+-y_{i+1}
++ y_i
++ \frac{h}{2}(y_i^2 + y_{i+1}^2)
+= 0.
+\]
+
+\subsection*{Solution 12}
+
+The system has exact solution
+\[
+y_1(t) = e^{-0.1t} + e^{-200t}, \qquad y_2(t) = e^{-200t}.
+\]
+
+(a) Compute values:
+
+\[
+\begin{aligned}
+y_1(0.1) &= e^{-0.01} + e^{-20} \approx 0.99005 + 2.06\times 10^{-9}, \\
+y_1(5)   &= e^{-0.5} + e^{-1000} \approx 0.60653 + 0, \\
+y_1(100) &= e^{-10} + e^{-20000} \approx 4.54\times 10^{-5}.
+\end{aligned}
+\]
+
+Thus the fast term disappears almost immediately.
+
+(b) The system is stiff because it contains two very different decay rates:
+\[
+\lambda_1 = -0.1, \qquad \lambda_2 = -200.
+\]
+One mode decays slowly (timescale \(10\)), the other extremely fast (timescale \(0.005\)).  
+Stiffness occurs when a solver must track both simultaneously.
+
+(c) Time scales:
+
+- Slow timescale:  
+\[
+\tau_{\text{slow}} = \frac{1}{0.1} = 10.
+\]
+- Fast timescale:  
+\[
+\tau_{\text{fast}} = \frac{1}{200} = 0.005.
+\]
+
+(d) Explicit Euler stability requires
+\[
+|1 + h\lambda| \le 1.
+\]
+For \(\lambda = -200\):
+\[
+h \le \frac{2}{200} = 0.01.
+\]
+Thus Euler would need step sizes **smaller than 0.01**, making it extremely inefficient.
+
+(e) Implicit solvers (Backward Euler, BDF) are stable for any \(h > 0\) on negative \(\lambda\).  
+Thus they take large steps while maintaining stability, making them appropriate for stiff systems.
+
+\subsection*{Solution 13}
+
+We apply RK4 with \(h = 0.1\) to the ODE \(y' = -2y + t\).
+
+\[
+f(t,y) = -2y + t.
+\]
+
+\textbf{Step 1: Compute the slopes}
+
+\[
+k_1 = f(0, 1) = -2(1) + 0 = -2.
+\]
+
+\[
+k_2 = f\left(0 + \frac{h}{2},\, 1 + \frac{h}{2}k_1\right)
+= f(0.05,\, 1 + 0.05(-2))
+= f(0.05,\, 0.9).
+\]
+\[
+k_2 = -2(0.9) + 0.05 = -1.75.
+\]
+
+\[
+k_3 = f\left(0 + \frac{h}{2},\, 1 + \frac{h}{2}k_2\right)
+= f(0.05,\, 1 + 0.05(-1.75))
+= f(0.05,\, 0.9125).
+\]
+\[
+k_3 = -2(0.9125) + 0.05 = -1.775.
+\]
+
+\[
+k_4 = f(0.1,\, 1 + h k_3)
+= f(0.1,\, 1 + 0.1(-1.775))
+= f(0.1,\, 0.8225).
+\]
+\[
+k_4 = -2(0.8225) + 0.1 = -1.545.
+\]
+
+\textbf{Step 2: Combine to obtain \(y_1\)}
+\[
+y_1 = 1 + \frac{h}{6}
+\left(k_1 + 2k_2 + 2k_3 + k_4\right)
+\]
+\[
+= 1 + \frac{0.1}{6}\left(-2 + 2(-1.75) + 2(-1.775) + (-1.545)\right).
+\]
+
+Compute the sum:
+\[
+-2 - 3.5 - 3.55 - 1.545 = -10.595.
+\]
+
+Thus:
+\[
+y_1 = 1 + \frac{0.1}{6}(-10.595)
+= 1 - 0.17658
+= 0.82342.
+\]
+
+\[
+\boxed{y(0.1) \approx 0.8234}
+\]
+
+
+\end{document}
