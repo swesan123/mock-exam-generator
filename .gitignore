@@ -42,6 +42,9 @@ htmlcov/
 # Generated exams
 mock_exams/
 
+# Progress tracking
+progress.json
+
 # OS
 .DS_Store
 Thumbs.db

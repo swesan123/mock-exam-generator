@@ -97,6 +97,89 @@ class TestParseLatexQuestions:
         assert len(questions) == 1
         assert "multi-line" in questions[0].text
         assert "multi-line" in questions[0].solution
+    
+    def test_parse_subsection_format_single_question(self):
+        """Test parsing subsection format with single problem and solution."""
+        latex_text = """
+        \\subsection*{Problem 1 — Test Problem}
+        Solve the equation x + 1 = 0.
+        
+        \\section*{Solutions}
+        \\subsection*{Solution 1}
+        x = -1
+        """
+        
+        questions = parse_latex_questions(latex_text, topic="test")
+        
+        assert len(questions) == 1
+        assert questions[0].topic == "test"
+        assert questions[0].id == "test_1"
+        assert "x + 1 = 0" in questions[0].text
+        assert "x = -1" in questions[0].solution
+    
+    def test_parse_subsection_format_multiple_questions(self):
+        """Test parsing subsection format with multiple problems and solutions."""
+        latex_text = """
+        \\subsection*{Problem 1}
+        Question 1 text
+        
+        \\subsection*{Problem 2}
+        Question 2 text
+        
+        \\section*{Solutions}
+        \\subsection*{Solution 1}
+        Solution 1 text
+        
+        \\subsection*{Solution 2}
+        Solution 2 text
+        """
+        
+        questions = parse_latex_questions(latex_text, topic="test")
+        
+        assert len(questions) == 2
+        assert questions[0].id == "test_1"
+        assert questions[1].id == "test_2"
+        assert "Question 1" in questions[0].text
+        assert "Question 2" in questions[1].text
+        assert "Solution 1" in questions[0].solution
+        assert "Solution 2" in questions[1].solution
+    
+    def test_parse_subsection_format_missing_solution(self):
+        """Test parsing subsection format where a problem has no solution."""
+        latex_text = """
+        \\subsection*{Problem 1}
+        Question 1 text
+        
+        \\subsection*{Problem 2}
+        Question 2 text
+        
+        \\section*{Solutions}
+        \\subsection*{Solution 1}
+        Solution 1 text
+        """
+        
+        questions = parse_latex_questions(latex_text, topic="test")
+        
+        assert len(questions) == 2
+        assert questions[0].solution != ""
+        assert questions[1].solution == ""  # Problem 2 has no solution
+    
+    def test_parse_subsection_format_with_title(self):
+        """Test parsing subsection format with problem titles."""
+        latex_text = """
+        \\subsection*{Problem 1 — First Problem}
+        Question text here
+        
+        \\section*{Solutions}
+        \\subsection*{Solution 1}
+        Solution text here
+        """
+        
+        questions = parse_latex_questions(latex_text, topic="test")
+        
+        assert len(questions) == 1
+        assert questions[0].id == "test_1"
+        assert "Question text here" in questions[0].text
 
 
 class TestLoadQuestionsFromLatex:
@@ -196,4 +279,56 @@ class TestLoadQuestionsFromLatex:
             questions = load_questions_from_latex(tmpdir)
             
             assert len(questions) == 1
+    
+    def test_load_subsection_format_file(self):
+        """Test loading questions from file with subsection format."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tex_file = Path(tmpdir) / "test.tex"
+            tex_file.write_text("""
+            \\subsection*{Problem 1}
+            Test question
+            
+            \\section*{Solutions}
+            \\subsection*{Solution 1}
+            Test solution
+            """)
+            
+            questions = load_questions_from_latex(tmpdir)
+            
+            assert len(questions) == 1
+            assert questions[0].topic == "test"
+            assert "Test question" in questions[0].text
+            assert "Test solution" in questions[0].solution
+    
+    def test_load_mixed_format_files(self):
+        """Test loading from files with different formats."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Old format file
+            file1 = Path(tmpdir) / "old.tex"
+            file1.write_text("""
+            \\begin{problem}
+            Old format question
+            \\end{problem}
+            \\begin{solution}
+            Old format solution
+            \\end{solution}
+            """)
+            
+            # New format file
+            file2 = Path(tmpdir) / "new.tex"
+            file2.write_text("""
+            \\subsection*{Problem 1}
+            New format question
+            
+            \\section*{Solutions}
+            \\subsection*{Solution 1}
+            New format solution
+            """)
+            
+            questions = load_questions_from_latex(tmpdir)
+            
+            assert len(questions) == 2
+            topics = [q.topic for q in questions]
+            assert "old" in topics
+            assert "new" in topics
 

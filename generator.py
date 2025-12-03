@@ -8,6 +8,7 @@ from typing import Optional
 from exporter import export_exam_to_latex, export_solutions_to_latex
 from models import Exam, QuestionBank
 from parser import load_questions_from_latex
+from persistence import load_progress, save_progress
 
 
 def generate_mock_exam(question_bank: QuestionBank, num_questions: int) -> Exam:
@@ -106,6 +107,7 @@ def main() -> None:
     # Configuration
     questions_folder = "questions"
     mock_exams_folder = "mock_exams"
+    progress_file = "progress.json"
     
     # Create necessary directories
     Path(questions_folder).mkdir(exist_ok=True)
@@ -125,6 +127,15 @@ def main() -> None:
         print("No questions found. Please add .tex files to the questions/ folder.")
         return
     
+    # Load saved progress
+    print("Loading saved progress...")
+    load_progress(question_bank, progress_file)
+    solved_count = question_bank.get_solved_count()
+    if solved_count > 0:
+        print(f"Resumed progress: {solved_count} questions already completed.")
+    else:
+        print("Starting fresh - no previous progress found.")
+    
     # Main loop
     while True:
         try:
@@ -137,7 +148,9 @@ def main() -> None:
             user_input = input().strip().lower()
             
             if user_input == 'q' or user_input == 'quit':
-                print("Goodbye!")
+                print("Saving progress...")
+                save_progress(question_bank, progress_file)
+                print("Progress saved! Goodbye!")
                 break
             
             try:
@@ -178,12 +191,21 @@ def main() -> None:
             print("\nReviewing your performance...")
             review_stats(question_bank)
             
+            # Save progress after each exam
+            save_progress(question_bank, progress_file)
+            print("Progress saved!")
+            
         except KeyboardInterrupt:
-            print("\n\nInterrupted by user. Goodbye!")
+            print("\n\nInterrupted by user. Saving progress...")
+            save_progress(question_bank, progress_file)
+            print("Progress saved! Goodbye!")
             break
         except Exception as e:
             print(f"\nError: {e}")
             print("Please try again.")
+    
+    # Save progress one final time before exiting
+    save_progress(question_bank, progress_file)
 
 
 if __name__ == "__main__":
