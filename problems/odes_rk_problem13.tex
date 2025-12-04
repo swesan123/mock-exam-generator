@@ -1,0 +1,30 @@
+\subsection*{Problem 12 — Stiff Linear System (Theory + Analysis)}
+
+Consider the stiff linear ODE system:
+
+\[
+y' =
+\begin{pmatrix}
+-0.1 & -199.9 \\
+0 & -200
+\end{pmatrix} y,
+\qquad y(0) = \begin{pmatrix}2 \\ 1\end{pmatrix}.
+\]
+
+The exact solution is:
+
+\[
+y_1(t) = e^{-0.1 t} + e^{-200 t}, \qquad 
+y_2(t) = e^{-200 t}.
+\]
+
+(a) Compute the values of \(y_1(0.1)\), \(y_1(5)\), and \(y_1(100)\).  
+
+(b) Explain why this system is considered \emph{stiff}.  
+
+(c) Determine the dominant time scale and the fast time scale in the solution.  
+
+(d) Explain why an explicit Euler method would require a extremely small stepsize to remain stable.  
+
+(e) Briefly describe why implicit solvers (e.g., backward Euler) handle this problem efficiently.
+

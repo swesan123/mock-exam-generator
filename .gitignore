@@ -38,12 +38,28 @@ ENV/
 .coverage
 htmlcov/
 .tox/
+.hypothesis/
 
-# Generated exams
-mock_exams/
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
 
-# Progress tracking
-progress.json
+# Output
+output/*.pdf
+output/*.tex
+!output/.gitkeep
+
+# Logs
+logs/*.log
+!logs/.gitkeep
+
+# Problem tracking
+.problem_tracker.json
 
 # OS
 .DS_Store
